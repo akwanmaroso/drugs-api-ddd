@@ -17,12 +17,37 @@ type Drug struct {
 	DeletedAt   *time.Time `json:"deleted_at"`
 }
 
+// BeforeSave is responsible for memorizing the password before saving it to db
 func (drug *Drug) BeforeSave() {
 	drug.Name = html.EscapeString(strings.TrimSpace(drug.Name))
 }
 
+// Prepare is in charge of ensuring the data entered into the db is correct
 func (drug *Drug) Prepare() {
 	drug.Name = html.EscapeString(strings.TrimSpace(drug.Name))
 	drug.CreatedAt = time.Now()
 	drug.UpdatedAt = time.Now()
+}
+
+// Validate is responsible for validating the data you want to save to db
+func (drug *Drug) Validate(action string) map[string]string {
+	var errorMessages = make(map[string]string)
+
+	switch strings.ToLower(action) {
+	case "update":
+		if drug.Name == "" || drug.Name == "null" {
+			errorMessages["title_required"] = "title is required"
+		}
+		if drug.Description == "" || drug.Description == "null" {
+			errorMessages["description_required"] = "description is required"
+		}
+	default:
+		if drug.Name == "" || drug.Name == "null" {
+			errorMessages["title_required"] = "title is required"
+		}
+		if drug.Description == "" || drug.Description == "null" {
+			errorMessages["description_required"] = "description is required"
+		}
+	}
+	return errorMessages
 }

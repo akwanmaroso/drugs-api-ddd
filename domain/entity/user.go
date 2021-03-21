@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/akwanmaroso/ddd-drugs/infrastructure/security"
+	"github.com/badoux/checkmail"
 )
 
 type User struct {
@@ -23,6 +24,7 @@ type PublicUser struct {
 	FullName string `gorm:"size:100;not null" json:"fullname"`
 }
 
+// BeforeSave is responsible for memorizing the password before saving it to db
 func (user *User) BeforeSave() error {
 	hashPassword, err := security.Hash(user.Password)
 	if err != nil {
@@ -39,11 +41,58 @@ func (user *User) PublicUser() interface{} {
 	}
 }
 
+// Prepare is in charge of ensuring the data entered into the db is correct
 func (user *User) Prepare() {
 	user.FullName = html.EscapeString(strings.TrimSpace(user.FullName))
 	user.Email = html.EscapeString(strings.TrimSpace(user.Email))
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
+}
+
+// Validate is responsible for validating the data you want to save to db
+func (user *User) Validate(action string) map[string]string {
+	var errorMessages map[string]string
+	var err error
+
+	switch strings.ToLower(action) {
+	case "update":
+		if user.Email == "" {
+			errorMessages["email_required"] = "email required"
+		}
+		if user.Email != "" {
+			if err = checkmail.ValidateFormat(user.Email); err != nil {
+				errorMessages["invalid_email"] = "please provide a valid email"
+			}
+		}
+	case "forgetpassword":
+		if user.Email == "" {
+			errorMessages["email_required"] = "email required"
+		}
+		if user.Email != "" {
+			if err = checkmail.ValidateFormat(user.Email); err != nil {
+				errorMessages["invalid_email"] = "please provide a valid email"
+			}
+		}
+	default:
+		if user.FullName == "" {
+			errorMessages["fullname_required"] = "fullname is required"
+		}
+		if user.Password == "" {
+			errorMessages["password_required"] = "password is required"
+		}
+		if user.Password == "" && len(user.Password) < 6 {
+			errorMessages["invalid_password"] = "password should be at least 6 characters"
+		}
+		if user.Email == "" {
+			errorMessages["email_required"] = "email required"
+		}
+		if user.Email != "" {
+			if err = checkmail.ValidateFormat(user.Email); err != nil {
+				errorMessages["invalid_email"] = "please provide a valid email"
+			}
+		}
+	}
+	return errorMessages
 }
 
 type Users []User
