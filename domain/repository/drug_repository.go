@@ -2,10 +2,10 @@ package repository
 
 import "github.com/akwanmaroso/ddd-drugs/domain/entity"
 
-type FoodRepository interface {
+type DrugRepository interface {
 	SaveDrug(*entity.Drug) (*entity.Drug, map[string]string)
-	GetFood(uint64) (*entity.Drug, error)
-	GetAllFood() ([]entity.Drug, error)
-	UpdateFood(*entity.Drug) (*entity.Drug, map[string]string)
-	DeleteFood(uint64) error
+	GetDrug(uint64) (*entity.Drug, error)
+	GetAllDrug() ([]entity.Drug, error)
+	UpdateDrug(*entity.Drug) (*entity.Drug, map[string]string)
+	DeleteDrug(uint64) error
 }
