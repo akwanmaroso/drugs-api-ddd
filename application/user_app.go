@@ -13,7 +13,7 @@ type UserAppInterface interface {
 	SaveUser(*entity.User) (*entity.User, map[string]string)
 	GetUser(uint64) (*entity.User, error)
 	GetUsers() ([]entity.User, error)
-	GetUserByEmailAndPassword(*entity.User) (entity.User, map[string]string)
+	GetUserByEmailAndPassword(*entity.User) (*entity.User, map[string]string)
 }
 
 // implement contract user-repository
@@ -31,6 +31,6 @@ func (u *userApps) GetUsers() ([]entity.User, error) {
 	return u.userApp.GetUsers()
 }
 
-func (u *userApps) GetUserByEmailAndPassword(user *entity.User) (entity.User, map[string]string) {
+func (u *userApps) GetUserByEmailAndPassword(user *entity.User) (*entity.User, map[string]string) {
 	return u.userApp.GetUserByEmailAndPassword(user)
 }
