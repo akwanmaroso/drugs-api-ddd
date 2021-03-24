@@ -7,6 +7,7 @@ import (
 	"github.com/akwanmaroso/ddd-drugs/domain/repository"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 type Repositories struct {
@@ -17,6 +18,7 @@ type Repositories struct {
 
 func NewRepositories(DbDriver, DbUser, DbPassword, DbPort, DbHost, DbName string) (*Repositories, error) {
 	DBURL := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s", DbHost, DbPort, DbUser, DbName, DbPassword)
+	fmt.Println(DBURL)
 	db, err := gorm.Open(DbDriver, DBURL)
 	if err != nil {
 		return nil, err
