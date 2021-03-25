@@ -24,7 +24,7 @@ type TokenInterface interface {
 
 var _ TokenInterface = &Token{}
 
-func (token Token) CreateToken(userId uint64) (*TokenDetails, error) {
+func (token *Token) CreateToken(userId uint64) (*TokenDetails, error) {
 	tokenDetails := &TokenDetails{}
 	tokenDetails.AtExpires = time.Now().Add(time.Minute * 15).Unix()
 	tokenDetails.TokenUuid = uuid.NewV4().String()
@@ -93,7 +93,7 @@ func ExtractToken(r *http.Request) string {
 	return ""
 }
 
-func (token Token) ExtractTokenMetadata(r *http.Request) (*AccessDetails, error) {
+func (token *Token) ExtractTokenMetadata(r *http.Request) (*AccessDetails, error) {
 	fmt.Println("WE ENTERED METADATA")
 	tokenJWT, err := VerifyToken(r)
 	if err != nil {
