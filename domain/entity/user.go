@@ -51,11 +51,23 @@ func (user *User) Prepare() {
 
 // Validate is responsible for validating the data you want to save to db
 func (user *User) Validate(action string) map[string]string {
-	var errorMessages map[string]string
+	var errorMessages = make(map[string]string)
 	var err error
 
 	switch strings.ToLower(action) {
 	case "update":
+		if user.Email == "" {
+			errorMessages["email_required"] = "email required"
+		}
+		if user.Email != "" {
+			if err = checkmail.ValidateFormat(user.Email); err != nil {
+				errorMessages["invalid_email"] = "please provide a valid email"
+			}
+		}
+	case "login":
+		if user.Password == "" {
+			errorMessages["password_required"] = "password required"
+		}
 		if user.Email == "" {
 			errorMessages["email_required"] = "email required"
 		}
