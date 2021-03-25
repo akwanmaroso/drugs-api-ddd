@@ -32,7 +32,7 @@ func (authenticate *Authenticate) Login(c *gin.Context) {
 	}
 
 	validateUser := user.Validate("login")
-	if len(validateUser) > 2 {
+	if len(validateUser) > 0 {
 		c.JSON(http.StatusUnprocessableEntity, validateUser)
 		return
 	}
@@ -56,13 +56,15 @@ func (authenticate *Authenticate) Login(c *gin.Context) {
 		return
 	}
 
+	fmt.Println("Pass")
+
 	userData := make(map[string]interface{})
 	userData["access_token"] = token.AccessToken
 	userData["refresh_token"] = token.RefreshToken
 	userData["id"] = u.ID
 	userData["fullname"] = u.FullName
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, userData)
 }
 
 func (authenticate *Authenticate) Logout(c *gin.Context) {
