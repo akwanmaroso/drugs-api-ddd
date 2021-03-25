@@ -17,7 +17,7 @@ func NewDrugRepository(db *gorm.DB) *DrugRepo {
 	return &DrugRepo{db}
 }
 
-// DrugRepo implments the contract of repository.DrugRepository interface
+// DrugRepo implement the contract of repository.DrugRepository interface
 var _ repository.DrugRepository = &DrugRepo{}
 
 func (repo *DrugRepo) SaveDrug(drug *entity.Drug) (*entity.Drug, map[string]string) {
@@ -25,7 +25,7 @@ func (repo *DrugRepo) SaveDrug(drug *entity.Drug) (*entity.Drug, map[string]stri
 	err := repo.db.Debug().Create(&drug).Error
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "Duplicate") {
-			dbErr["unique_name"] = "drug name aleardy taken"
+			dbErr["unique_name"] = "drug name already taken"
 			return nil, dbErr
 		}
 		dbErr["db_error"] = "database error"
@@ -37,11 +37,11 @@ func (repo *DrugRepo) SaveDrug(drug *entity.Drug) (*entity.Drug, map[string]stri
 func (repo *DrugRepo) GetDrug(drugId uint64) (*entity.Drug, error) {
 	var drug entity.Drug
 	err := repo.db.Debug().Where("id = ?", drugId).Take(&drug).Error
-	if err != nil {
-		return nil, errors.New("Database error, please try again")
-	}
 	if gorm.IsRecordNotFoundError(err) {
-		return nil, errors.New("Drug not found")
+		return nil, errors.New("drug not found")
+	}
+	if err != nil {
+		return nil, errors.New("database error, please try again")
 	}
 	return &drug, nil
 }
