@@ -4,6 +4,7 @@ import (
 	"github.com/akwanmaroso/ddd-drugs/application"
 	"github.com/akwanmaroso/ddd-drugs/domain/entity"
 	"github.com/akwanmaroso/ddd-drugs/infrastructure/auth"
+	"github.com/akwanmaroso/ddd-drugs/utils/response"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -62,7 +63,7 @@ func (u *Users) GetUser(c *gin.Context) {
 	}
 	user, err := u.userInterface.GetUser(userId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusInternalServerError, response.ResponseJSON(true, http.StatusInternalServerError, err.Error()))
 		return
 	}
 	c.JSON(http.StatusOK, user.PublicUser())
