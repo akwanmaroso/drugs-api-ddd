@@ -24,7 +24,7 @@ func NewAuthenticate(userInterface application.UserAppInterface, refreshInterfac
 
 func (authenticate *Authenticate) Login(c *gin.Context) {
 	var user *entity.User
-	var responTokenErr = map[string]string{}
+	var respondTokenErr = map[string]string{}
 
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, "invalid json provided")
@@ -45,7 +45,7 @@ func (authenticate *Authenticate) Login(c *gin.Context) {
 
 	token, tokenError := authenticate.tokenInterface.CreateToken(u.ID)
 	if tokenError != nil {
-		responTokenErr["token_error"] = tokenError.Error()
+		respondTokenErr["token_error"] = tokenError.Error()
 		c.JSON(http.StatusUnprocessableEntity, tokenError.Error())
 		return
 	}
