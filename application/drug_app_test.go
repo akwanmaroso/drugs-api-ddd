@@ -59,3 +59,56 @@ func TestSaveDrug_Success(t *testing.T) {
 	assert.EqualValues(t, d.Description, "drug description")
 	assert.EqualValues(t, d.UserID, 1)
 }
+
+func TestGetAllDrug_Success(t *testing.T) {
+	getAllDrugRepo = func() ([]entity.Drug, error) {
+		return []entity.Drug{
+			{
+				ID:          1,
+				Name:        "drug name first",
+				Description: "drug description first",
+				UserID:      1,
+			}, {
+				ID:          2,
+				Name:        "drug name second",
+				Description: "drug description second",
+				UserID:      2,
+			},
+		}, nil
+	}
+	drug, err := drugAppFake.GetAllDrug()
+	assert.Nil(t, err)
+	assert.EqualValues(t, len(drug), 2)
+}
+
+func TestUpdateDrug_Success(t *testing.T) {
+	updateDrugRepo = func(drug *entity.Drug) (*entity.Drug, map[string]string) {
+		return &entity.Drug{
+			ID:          1,
+			Name:        "drug title update",
+			Description: "drug description update",
+			UserID:      1,
+		}, nil
+	}
+	drug := &entity.Drug{
+		ID:          1,
+		Name:        "drug title update",
+		Description: "drug description update",
+		UserID:      1,
+	}
+	d, err := drugAppFake.UpdateDrug(drug)
+	assert.Nil(t, err)
+	assert.EqualValues(t, d.Name, "drug title update")
+	assert.EqualValues(t, d.Description, "drug description update")
+	assert.EqualValues(t, d.UserID, 1)
+}
+
+func TestDeleteDrug_Success(t *testing.T) {
+	deleteDrugRepo = func(drugId uint64) error {
+		return nil
+	}
+
+	drugId := uint64(1)
+	err := drugAppFake.DeleteDrug(drugId)
+	assert.Nil(t, err)
+}
