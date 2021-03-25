@@ -14,8 +14,8 @@ func (auth *AuthInterface) DeleteRefresh(refreshUuid string) error {
 	return auth.DeleteRefreshFn(refreshUuid)
 }
 
-func (auth *AuthInterface) DeleteTokens(accessDetails auth.AccessDetails) error {
-	return auth.DeleteTokens(accessDetails)
+func (auth *AuthInterface) DeleteToken(accessDetails *auth.AccessDetails) error {
+	return auth.DeleteTokensFn(accessDetails)
 }
 
 func (auth *AuthInterface) FetchAuth(uuid string) (uint64, error) {
