@@ -36,17 +36,23 @@ func (drug *Drug) Validate(action string) map[string]string {
 	switch strings.ToLower(action) {
 	case "update":
 		if drug.Name == "" || drug.Name == "null" {
-			errorMessages["title_required"] = "title is required"
+			errorMessages["name_required"] = "name is required"
 		}
 		if drug.Description == "" || drug.Description == "null" {
 			errorMessages["description_required"] = "description is required"
+		}
+		if drug.DrugImage == "" || drug.DrugImage == "null" {
+			errorMessages["drug_image_required"] = "drug image is required"
 		}
 	default:
 		if drug.Name == "" || drug.Name == "null" {
-			errorMessages["title_required"] = "title is required"
+			errorMessages["name_required"] = "name is required"
 		}
 		if drug.Description == "" || drug.Description == "null" {
 			errorMessages["description_required"] = "description is required"
+		}
+		if drug.DrugImage == "" || drug.DrugImage == "null" {
+			errorMessages["drug_image_required"] = "drug image is required"
 		}
 	}
 	return errorMessages
