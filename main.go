@@ -35,7 +35,10 @@ func main() {
 	}
 
 	defer services.Close()
-	services.Automigrate()
+	err = services.Automigrate()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	redisService, err := auth.NewRedisDB(redisHost, redisPort, redisPassword)
 	if err != nil {
@@ -46,16 +49,24 @@ func main() {
 
 	users := interfaces.NewUsers(services.User, token, redisService.Auth)
 	drugs := interfaces.NewDrug(services.Drug, services.User, token, redisService.Auth)
-	//	authenticate := interfaces.NewAuthenticate(services.User, redisService.Auth, token)
+	authenticate := interfaces.NewAuthenticate(services.User, redisService.Auth, token)
 
 	r := gin.Default()
 
 	// users route
 	r.GET("/users", users.GetUsers)
-	r.GET("/users/user_id", users.GetUser)
+	r.POST("/users", users.SaveUser)
+	r.GET("/users/:user_id", users.GetUser)
 
 	// drugs route
 	r.GET("/drugs", drugs.GetAllDrug)
+	r.GET("/drugs/:drug_id", drugs.GetDrugAndCreator)
+	r.POST("/drugs", drugs.SaveDrug)
+
+	// Authentication
+	r.POST("/login", authenticate.Login)
+	r.POST("/refresh", authenticate.Refresh)
+	r.POST("/logout", authenticate.Logout)
 
 	PORT := os.Getenv("PORT") // implement in heroku
 	if PORT == "" {
