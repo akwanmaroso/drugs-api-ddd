@@ -5,6 +5,7 @@ import (
 	"github.com/akwanmaroso/ddd-drugs/application"
 	"github.com/akwanmaroso/ddd-drugs/domain/entity"
 	"github.com/akwanmaroso/ddd-drugs/infrastructure/auth"
+	"github.com/akwanmaroso/ddd-drugs/utils/response"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -26,7 +27,7 @@ func (drug *Drug) SaveDrug(c *gin.Context) {
 	// check if this user is authenticated
 	metadata, err := drug.tokenInterface.ExtractTokenMetadata(c.Request)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, "unauthorized")
+		c.JSON(http.StatusUnauthorized, err.Error())
 		return
 	}
 
@@ -50,11 +51,11 @@ func (drug *Drug) SaveDrug(c *gin.Context) {
 	}
 
 	emptyDrug := entity.Drug{}
+	fmt.Println(name)
 	emptyDrug.Name = name
 	emptyDrug.Description = description
 	emptyDrug.DrugImage = image
 	saveDrugError = emptyDrug.Validate("")
-
 	if len(saveDrugError) > 0 {
 		c.JSON(http.StatusUnprocessableEntity, saveDrugError)
 		return
@@ -84,14 +85,14 @@ func (drug *Drug) UpdateDrug(c *gin.Context) {
 	// check if this user is authenticated
 	metadata, err := drug.tokenInterface.ExtractTokenMetadata(c.Request)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, "unauthorized")
+		c.JSON(http.StatusUnauthorized, response.ResponseJSON(true, http.StatusUnauthorized, "unauthorized"))
 		return
 	}
 
 	// lookup the metadata in redis
 	userId, err := drug.refreshInterface.FetchAuth(metadata.TokenUuid)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, "unauthorized")
+		c.JSON(http.StatusUnauthorized, response.ResponseJSON(true, http.StatusUnauthorized, "unauthorized"))
 		return
 	}
 
@@ -129,7 +130,7 @@ func (drug *Drug) UpdateDrug(c *gin.Context) {
 	// check if the drug exist:
 	drugToUpdate, err := drug.drugApp.GetDrug(drugId)
 	if err != nil {
-		c.JSON(http.StatusNotFound, err.Error())
+		c.JSON(http.StatusNotFound, response.ResponseJSON(true, http.StatusUnauthorized, err.Error()))
 		return
 	}
 
@@ -167,13 +168,13 @@ func (drug *Drug) GetDrugAndCreator(c *gin.Context) {
 	}
 	drugs, err := drug.drugApp.GetDrug(drugId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusInternalServerError, response.ResponseJSON(true, http.StatusUnauthorized, err.Error()))
 		return
 	}
 
 	user, err := drug.userApp.GetUser(drugs.UserID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusInternalServerError, response.ResponseJSON(true, http.StatusUnauthorized, err.Error()))
 		return
 	}
 
